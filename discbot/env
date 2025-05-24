@@ -1,0 +1,8 @@
+# Discord Configuration
+DISCORD_TOKEN=
+DISCORD_CHANNEL_ID=
+
+# Gmail Configuration
+#GMAIL_USER=
+#GMAIL_APP_PASSWORD=
+#RECIPIENT_EMAIL=

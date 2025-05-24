@@ -1,0 +1,8 @@
+# Dependencias principales
+discord.py>=2.0.0
+python-dotenv>=0.19.0
+watchdog>=2.1.0
+requests>=2.25.0
+
+# Dependencias opcionales para mejor rendimiento
+aiohttp>=3.8.0
