@@ -116,7 +116,7 @@ El bot está diseñado para soportar los siguientes servicios (configurables en 
 * `mysql`
 * `postgresql`
 
->[!WARNING ] Es posible que de fallos referentes a algunas rutas dependiendo tanto de la versión como la del sistema opertivo así como si hay diferencias en la configuración sugerida en el documento 
+>[!WARNING] Es posible que de fallos referentes a algunas rutas dependiendo tanto de la versión como la del sistema opertivo así como si hay diferencias en la configuración sugerida en el documento 
 
 Puedes añadir o modificar las rutas de log directamente en el diccionario `raw_paths` dentro de `bot.py`.
 
@@ -133,9 +133,3 @@ Puedes añadir o modificar las rutas de log directamente en el diccionario `raw_
 
 Este proyecto está licenciado bajo los términos del repositorio original.
 
-```
-
----
-
-¿Deseas que este contenido se inserte automáticamente en un archivo `README.md` en el proyecto? Puedo ayudarte a hacerlo.
-```
