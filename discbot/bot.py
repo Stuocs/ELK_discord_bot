@@ -44,7 +44,7 @@ LOG_PATHS = {
     'memory': '/var/log/syslog',  # Para logs de memoria
     'iptables': '/var/log/kern.log',  # Para logs de iptables
     'kern': '/var/log/kern.log',  # Para logs del kernel
-    'logstash': '/var/log/syslog',  # Para logs de logstash
+    'logstash': '/var/log/logst.log',  # Para logs de logstash
     'nginx': '/var/log/nginx/error.log',  # Para logs de nginx
     'auth': '/var/log/auth.log',  # Para logs de autenticación
     'syslog': '/var/log/syslog',  # Para logs del sistema
@@ -82,6 +82,8 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+#ips_recientes
+recent_ssh_ips = set()
 
 
 # Function to send message via Discord API
@@ -290,11 +292,37 @@ def read_last_lines(file_path, num_lines=MAX_LINES, filter_pattern=None):
         return f"❌ Error leyendo archivo {file_path}: {e}"
 
 
+@tasks.loop(seconds=5)
+async def monitor_ssh_connections():
+    log_path = LOG_PATHS.get('iptables')
+    if not os.path.exists(log_path):
+        logger.warning(f"No se encontró el archivo de log: {log_path}")
+        return
+
+    result = read_last_lines(log_path, 100, filter_pattern='iptables')
+    lines = result.strip().split('\n')
+
+    for line in lines:
+        if 'dpt:22' in line or 'DPT=22' in line or 'DSTPORT=22' in line:
+            # Extraer IP fuente
+            ip_match = re.search(r'(SRC=|src=)(\d+\.\d+\.\d+\.\d+)', line)
+            if ip_match:
+                ip = ip_match.group(2)
+                if ip not in recent_ssh_ips:
+                    recent_ssh_ips.add(ip)
+
+                    msg = f"🚨 **Nueva conexión SSH detectada via IPTABLES**\nOrigen: `{ip}`\n```{line[:1900]}```"
+                    await send_discord_message(msg)
+                    logger.info(f"Alerta SSH enviada para IP {ip}")
 
 @bot.event
 async def on_ready():
     logger.info(f'{bot.user.name} has connected to Discord!')
     
+    #Check if someone enters via ssh
+    if not monitor_ssh_connections.is_running():
+        monitor_ssh_connections.start()
+        
     # Verificar que el canal existe
     channel_id = int(os.getenv('DISCORD_CHANNEL_ID'))
     channel = bot.get_channel(channel_id)
@@ -429,7 +457,7 @@ async def log_paragraphs(ctx, count: int = 5):
     await ctx.send(f"🔍 **Buscando {count} párrafos por palabra clave en {log_path}**")
 
     # Leer muchas líneas para encontrar suficientes ocurrencias
-    raw_output = read_last_lines(log_path, 1000, filter_pattern=None)
+    raw_output = read_last_lines(log_path, 999999999, filter_pattern=None)
     lines_list = raw_output.strip().split('\n')
 
     matched_by_keyword = {kw: [] for kw in keywords}
