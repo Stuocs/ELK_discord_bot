@@ -1,4 +1,3 @@
-````markdown
 # ELK Discord Bot
 
 Este bot está diseñado para integrarse con un stack ELK (Elasticsearch, Logstash, Kibana) y enviar eventos relevantes a un canal de Discord. Es útil para la monitorización en tiempo real de logs del sistema y servicios como PostgreSQL, Nginx, Apache, etc.
@@ -35,7 +34,6 @@ output {
     create_if_deleted => true
   }
 }
-````
 
 Esto generará un archivo de logs en formato JSON que será leído por el bot para enviar eventos a Discord.
 
